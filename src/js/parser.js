@@ -1,6 +1,11 @@
 let parsingResults = [];
 export {parsingResults};
 
+function resetResults(){
+    parsingResults = [];
+}
+export {resetResults};
+
 function parseBinaryExpression(binExp) {
     if (binExp.type === 'Literal') {
         return binExp.value + '';
@@ -15,7 +20,7 @@ function parseBinaryExpression(binExp) {
         return binExp.operator + '' + parseBinaryExpression(binExp.argument);
     }
     else{
-        return parseBinaryExpression(binExp.left) + '' + binExp.operator + '' + parseBinaryExpression(binExp.right);
+        return parseBinaryExpression(binExp.left) + ' ' + binExp.operator + ' ' + parseBinaryExpression(binExp.right);
     }
 }
 

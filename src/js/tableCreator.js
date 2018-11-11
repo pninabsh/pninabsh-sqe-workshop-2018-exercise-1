@@ -1,19 +1,6 @@
 import $ from 'jquery';
 import {parsingResults} from './parser';
 
-/*function addRow(dataRow, table){
-    /*table.append('<tr>');
-    table.append('<td>' + $('#dataRow.type') + '</td>');
-    table.append('<td>' + $('#dataRow.type').val() + '</td>');
-    table.append('<td>' + $('#dataRow.type').val() + '</td>');
-    table.append('<td>' + $('#dataRow.type').val() + '</td>');
-    table.append('</tr>');*/
-/*const htmlRow = document.createElement('tr');
-const { htmlLineNum,htmlLineType,htmlLineName,htmlLineCondition, htmlLineValue } = rowToHtml(dataRow);
-htmlRow.append(htmlLineNum,htmlLineType,htmlLineName, htmlLineCondition, htmlLineValue);
-table.append(htmlRow);
-}*/
-
 function createTable(){
     const ResultsList = $('#ResultsList');
     let content = '<table align="center" class="table table-bordered" id="parsing_table">';
