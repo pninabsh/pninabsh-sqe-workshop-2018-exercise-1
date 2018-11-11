@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import {parseCode} from './code-analyzer';
-import {parseExp, resetResults} from './parser';
+import {parseBody, resetResults} from './parser';
 import {createTable} from './tableCreator';
 
 
@@ -11,9 +11,7 @@ $(document).ready(function () {
         let codeToParse = $('#codePlaceholder').val();
         let parsedCode = parseCode(codeToParse);
         $('#parsedCode').val(JSON.stringify(parsedCode, null, 2));
-        for(let bodyElement of parsedCode.body){
-            parseExp(bodyElement, false);
-        }
+        parseBody(parsedCode);
         createTable();
     });
 });

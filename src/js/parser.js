@@ -47,13 +47,13 @@ function handleVariableDeclaration(exp){
 }
 
 function handleVariableDeclarator(exp){
-    const variableDeclaration = {
-        line: exp.loc.start.line,
-        type: 'variable declaration',
-        name: exp.id.name,
-        condition: '',
-        value: ''
-    };
+    let variableDeclaration;
+    if(exp.init == null){
+        variableDeclaration = {line: exp.loc.start.line, type: 'variable declaration', name: exp.id.name, condition: '', value: ''};
+    }
+    else{
+        variableDeclaration = {line: exp.loc.start.line, type: 'variable declaration', name: exp.id.name, condition: '', value: exp.init.value};
+    }
     parsingResults.push(variableDeclaration);
 }
 
@@ -100,23 +100,38 @@ function handleReturnStatement(exp){
     parsingResults.push(returnStatement);
 }
 
-function parseExpHelpFunc(exp, alternate){
+function parseExpHelpFunc2(exp, alternate){
     switch(exp.type){
-    case 'ExpressionStatement': handleExpressionStatement(exp); break;
     case 'WhileStatement': handleWhileStatement(exp); break;
     case 'IfStatement': handleIfStatement(exp, alternate); break;
     case 'ReturnStatement': handleReturnStatement(exp); break;
     }
 }
 
-function parseExp (exp, alternate) {
-    switch (exp.type) {
-    case 'FunctionDeclaration': handleFunctionDeclaration(exp); break;
+function parseExpHelpFunc(exp, alternate){
+    switch(exp.type){
     case 'BlockStatement': handleBlockStatement(exp); break;
+    case 'FunctionDeclaration': handleFunctionDeclaration(exp); break;
+    case 'ExpressionStatement': handleExpressionStatement(exp); break;
+    default: parseExpHelpFunc2(exp, alternate);
+    }
+}
+
+function parseExp (exp, alternate) {
+    if(exp === undefined || exp === ''){
+        return;
+    }
+    switch (exp.type) {
     case 'VariableDeclaration': handleVariableDeclaration(exp); break;
     case 'VariableDeclarator': handleVariableDeclarator(exp); break;
     default: parseExpHelpFunc(exp, alternate);
     }
 }
 
-export {parseExp};
+function parseBody(parsedCode){
+    for(let bodyElement of parsedCode.body){
+        parseExp(bodyElement, false);
+    }
+}
+
+export {parseBody};
