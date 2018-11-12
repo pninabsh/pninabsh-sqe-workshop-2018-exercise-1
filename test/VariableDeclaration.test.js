@@ -1,7 +1,6 @@
 import assert from 'assert';
 import {parseBody, parsingResults, resetResults} from '../src/js/parser';
 import {parseCode} from '../src/js/code-analyzer';
-import {describe} from 'nyc/lib/commands/check-coverage';
 
 describe('The javascript variable declaration parser', () => {
     it('is parsing a simple let expression with init correctly', () => {
