@@ -11,5 +11,25 @@ describe('The javascript parser', () => {
             []
         );
     });
+
+    it('is parsing an literal expression correctly', () => {
+        resetResults();
+        parseBody(parseCode('5'));
+        assert.deepEqual(
+            parsingResults,
+            []
+        );
+    });
 });
 
+
+describe('The javascript parser', () => {
+    it('is parsing a class expression that we dont handle', () => {
+        resetResults();
+        parseBody(parseCode('class name{}'));
+        assert.deepEqual(
+            parsingResults,
+            []
+        );
+    });
+});
