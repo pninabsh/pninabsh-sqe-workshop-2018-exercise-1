@@ -24,12 +24,21 @@ describe('The javascript while statement parser', () => {
 });
 
 describe('The javascript while statement parser', () => {
-    it('is parsing a simple for statement without body', () => {
+    it('is parsing a simple for statement', () => {
         resetResults();
         parseBody(parseCode('for(x = 0; x < 5; x++){}'));
         assert.deepEqual(
             parsingResults,
             [{line: 1, type: 'for statement', name: '', condition: 'x = 0; x < 5; x++', value: ''}]
+        );
+    });
+
+    it('is parsing a simple for statement', () => {
+        resetResults();
+        parseBody(parseCode('for(x = 0; x < 5; ++x){}'));
+        assert.deepEqual(
+            parsingResults,
+            [{line: 1, type: 'for statement', name: '', condition: 'x = 0; x < 5; ++x', value: ''}]
         );
     });
 });
