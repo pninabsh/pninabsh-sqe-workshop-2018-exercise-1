@@ -5,10 +5,10 @@ import {parseCode} from '../src/js/code-analyzer';
 describe('The javascript assignment expression parser', () => {
     it('is parsing a simple assignment expression with literal correctly', () => {
         resetResults();
-        parseBody(parseCode('a = 5;'));
+        parseBody(parseCode('x[5] = 5;'));
         assert.deepEqual(
             parsingResults,
-            [{line: 1, type: 'assignment expression', name: 'a', condition: '', value: '5'}]
+            [{line: 1, type: 'assignment expression', name: 'x[5]', condition: '', value: '5'}]
         );
     });
     it('is parsing a simple assignment expression with binary expression correctly', () => {

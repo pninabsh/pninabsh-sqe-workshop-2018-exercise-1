@@ -16,7 +16,8 @@ describe('The javascript function declaration parser', () => {
         parseBody(parseCode('function foo(x){\n a = 5; \n }'));
         assert.deepEqual(
             parsingResults,
-            [{line: 1, type: 'function declaration', name: 'foo', condition: '', value: ''}, {line: 1, type: 'variable declaration', name: 'x', condition: '', value: ''}, {line: 2, type: 'assignment expression', name: 'a', condition: '', value: '5'}]
+            [{line: 1, type: 'function declaration', name: 'foo', condition: '', value: ''},
+                {line: 1, type: 'variable declaration', name: 'x', condition: '', value: ''}, {line: 2, type: 'assignment expression', name: 'a', condition: '', value: '5'}]
         );
     });
 });

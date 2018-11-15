@@ -6,7 +6,9 @@ function resetResults(){
 }
 export {resetResults};
 
-function parseBinaryExpression(binExp) {
+
+
+function parseSmallExpression(binExp) {
     if (binExp.type === 'Literal') {
         return binExp.value + '';
     }
@@ -14,13 +16,13 @@ function parseBinaryExpression(binExp) {
         return binExp.name + '';
     }
     else if (binExp.type === 'MemberExpression') {
-        return parseBinaryExpression(binExp.object) + '[' + parseBinaryExpression(binExp.property) + ']';
+        return parseSmallExpression(binExp.object) + '[' + parseSmallExpression(binExp.property) + ']';
     }
     else if(binExp.type === 'UnaryExpression') {
-        return binExp.operator + '' + parseBinaryExpression(binExp.argument);
+        return binExp.operator + '' + parseSmallExpression(binExp.argument);
     }
     else{
-        return parseBinaryExpression(binExp.left) + ' ' + binExp.operator + ' ' + parseBinaryExpression(binExp.right);
+        return parseSmallExpression(binExp.left) + ' ' + binExp.operator + ' ' + parseSmallExpression(binExp.right);
     }
 }
 
@@ -61,27 +63,31 @@ function handleExpressionStatement(exp){
     const variableAssignment = {
         line: exp.loc.start.line,
         type: 'assignment expression',
-        name: parseBinaryExpression(exp.expression.left),
+        name: parseSmallExpression(exp.expression.left),
         condition: '',
-        value: parseBinaryExpression(exp.expression.right)
+        value: parseSmallExpression(exp.expression.right)
     };
     parsingResults.push(variableAssignment);
 }
 
 function handleWhileStatement(exp){
-    const whileStatement = { line: exp.loc.start.line, type: 'while statement', name: '', condition: parseBinaryExpression(exp.test), value: '' };
+    const whileStatement = { line: exp.loc.start.line, type: 'while statement', name: '', condition: parseSmallExpression(exp.test), value: '' };
     parsingResults.push(whileStatement);
     parseExp(exp.body, false);
 }
 
+function handleForStatement(exp){
+    const init = exp.init.left.name + ' ' + exp.init.operator + ' ' + exp.init.right.value;
+    const test = exp.test.left.name + ' ' + exp.test.operator + ' ' + parseSmallExpression(exp.test.right);
+    const update = exp.update.prefix ? exp.update.operator + '' + exp.update.argument.name : exp.update.argument.name + '' + exp.update.operator;
+    const condition = init + '; ' + test + '; ' + update;
+    const forStatement = { line: exp.loc.start.line, type: 'for statement', name: '', condition: condition, value: '' };
+    parsingResults.push(forStatement);
+}
+
 function handleIfStatement(exp, alternate){
-    let ifStatement;
-    if(alternate){
-        ifStatement = { line: exp.loc.start.line, type: 'else if statement', name: '', condition: parseBinaryExpression(exp.test), value: ''};
-    }
-    else{
-        ifStatement = { line: exp.loc.start.line, type: 'if statement', name: '', condition: parseBinaryExpression(exp.test), value: ''};
-    }
+    let typeExpression = alternate? 'else if statement' : 'if statement';
+    let ifStatement = { line: exp.loc.start.line, type: typeExpression, name: '', condition: parseSmallExpression(exp.test), value: ''};
     parsingResults.push(ifStatement);
     parseExp(exp.consequent);
     if(exp.alternate != null){
@@ -95,7 +101,7 @@ function handleReturnStatement(exp){
         type: 'return statement',
         name: '',
         condition: '',
-        value: parseBinaryExpression(exp.argument)
+        value: parseSmallExpression(exp.argument)
     };
     parsingResults.push(returnStatement);
 }
@@ -103,6 +109,7 @@ function handleReturnStatement(exp){
 function parseExpHelpFunc2(exp, alternate){
     switch(exp.type){
     case 'WhileStatement': handleWhileStatement(exp); break;
+    case 'ForStatement' : handleForStatement(exp); break;
     case 'IfStatement': handleIfStatement(exp, alternate); break;
     case 'ReturnStatement': handleReturnStatement(exp); break;
     }

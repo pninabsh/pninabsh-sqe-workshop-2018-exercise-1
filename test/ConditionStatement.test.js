@@ -13,7 +13,7 @@ describe('The javascript condition statement parser', () => {
     });
     it('is parsing a simple condition expression if and else if statements', () => {
         resetResults();
-        parseBody(parseCode('if(x){}\nelse if(y){}'));
+        parseBody(parseCode('if(x){}\nelse if(y){}\nelse{}'));
         assert.deepEqual(
             parsingResults,
             [{line: 1, type: 'if statement', name: '', condition: 'x', value: ''},

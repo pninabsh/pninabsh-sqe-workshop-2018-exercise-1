@@ -2,7 +2,7 @@ import assert from 'assert';
 import {parseBody, parsingResults, resetResults} from '../src/js/parser';
 import {parseCode} from '../src/js/code-analyzer';
 
-describe('The javascript loop statement parser', () => {
+describe('The javascript while statement parser', () => {
     it('is parsing a simple while statement without body', () => {
         resetResults();
         parseBody(parseCode('while(x){}'));
@@ -19,6 +19,17 @@ describe('The javascript loop statement parser', () => {
             [{line: 1, type: 'while statement', name: '', condition: 'x', value: ''},
                 {line: 2, type: 'assignment expression', name: 'x', condition: '', value: 'x + 2'}
             ]
+        );
+    });
+});
+
+describe('The javascript while statement parser', () => {
+    it('is parsing a simple for statement without body', () => {
+        resetResults();
+        parseBody(parseCode('for(x = 0; x < 5; x++){}'));
+        assert.deepEqual(
+            parsingResults,
+            [{line: 1, type: 'for statement', name: '', condition: 'x = 0; x < 5; x++', value: ''}]
         );
     });
 });
