@@ -17,8 +17,20 @@ describe('The javascript condition statement parser', () => {
         assert.deepEqual(
             parsingResults,
             [{line: 1, type: 'if statement', name: '', condition: 'x', value: ''},
-                {line: 2, type: 'else if statement', name: '', condition: 'y', value: ''}
-            ]
+                {line: 2, type: 'else if statement', name: '', condition: 'y', value: ''},
+                {line: 2, type: 'else statement', name: '', condition: '', value: ''}]
+        );
+    });
+});
+
+describe('The javascript condition statement parser', () => {
+    it('is parsing a simple condition expression with single if statement', () => {
+        resetResults();
+        parseBody(parseCode('if(x){\n}\nelse{\n}'));
+        assert.deepEqual(
+            parsingResults,
+            [{line: 1, type: 'if statement', name: '', condition: 'x', value: ''},
+                {line: 1, type: 'else statement', name: '', condition: '', value: ''}]
         );
     });
 });

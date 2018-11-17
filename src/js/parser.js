@@ -6,7 +6,14 @@ function resetResults(){
 }
 export {resetResults};
 
-
+function parseSmallExpressionHelp(binExp){
+    if(binExp.type === 'UpdateExpression'){
+        return binExp.prefix ? binExp.operator + '' + binExp.argument.name : binExp.argument.name + '' + binExp.operator;
+    }
+    else{
+        return parseSmallExpression(binExp.left) + ' ' + binExp.operator + ' ' + parseSmallExpression(binExp.right);
+    }
+}
 
 function parseSmallExpression(binExp) {
     if (binExp.type === 'Literal') {
@@ -22,7 +29,7 @@ function parseSmallExpression(binExp) {
         return binExp.operator + '' + parseSmallExpression(binExp.argument);
     }
     else{
-        return parseSmallExpression(binExp.left) + ' ' + binExp.operator + ' ' + parseSmallExpression(binExp.right);
+        return parseSmallExpressionHelp(binExp);
     }
 }
 
@@ -30,7 +37,7 @@ function handleFunctionDeclaration(exp){
     const functionDeclaration = { line: exp.loc.start.line, type: 'function declaration', name: exp.id.name, condition: '', value: '' };
     parsingResults.push(functionDeclaration);
     for (let param of exp.params) {
-        const parsedParam = {line: exp.loc.start.line, type: 'variable declaration', name: param.name, condition: '', value: '' };
+        const parsedParam = { line: exp.loc.start.line, type: 'variable declaration', name: param.name, condition: '', value: '' };
         parsingResults.push(parsedParam);
     }
     parseExp(exp.body, false);
@@ -49,25 +56,22 @@ function handleVariableDeclaration(exp){
 }
 
 function handleVariableDeclarator(exp){
-    let variableDeclaration;
-    if(exp.init == null){
-        variableDeclaration = {line: exp.loc.start.line, type: 'variable declaration', name: exp.id.name, condition: '', value: ''};
-    }
-    else{
-        variableDeclaration = {line: exp.loc.start.line, type: 'variable declaration', name: exp.id.name, condition: '', value: exp.init.value};
-    }
+    let value = exp.init == null ? '' : exp.init.value;
+    let variableDeclaration = { line: exp.loc.start.line, type: 'variable declaration', name: exp.id.name, condition: '', value: value };
     parsingResults.push(variableDeclaration);
 }
 
 function handleExpressionStatement(exp){
-    const variableAssignment = {
-        line: exp.loc.start.line,
-        type: 'assignment expression',
-        name: parseSmallExpression(exp.expression.left),
-        condition: '',
-        value: parseSmallExpression(exp.expression.right)
-    };
-    parsingResults.push(variableAssignment);
+    if(exp.expression.type === 'AssignmentExpression') {
+        const variableAssignment = {
+            line: exp.loc.start.line,
+            type: 'assignment expression',
+            name: parseSmallExpression(exp.expression.left),
+            condition: '',
+            value: parseSmallExpression(exp.expression.right)
+        };
+        parsingResults.push(variableAssignment);
+    }
 }
 
 function handleWhileStatement(exp){
@@ -79,8 +83,7 @@ function handleWhileStatement(exp){
 function handleForStatement(exp){
     const init = exp.init.left.name + ' ' + exp.init.operator + ' ' + exp.init.right.value;
     const test = exp.test.left.name + ' ' + exp.test.operator + ' ' + parseSmallExpression(exp.test.right);
-    const update = exp.update.prefix ? exp.update.operator + '' + exp.update.argument.name : exp.update.argument.name + '' + exp.update.operator;
-    const condition = init + '; ' + test + '; ' + update;
+    const condition = init + '; ' + test + '; ' + parseSmallExpression(exp.update);
     const forStatement = { line: exp.loc.start.line, type: 'for statement', name: '', condition: condition, value: '' };
     parsingResults.push(forStatement);
 }
@@ -90,8 +93,13 @@ function handleIfStatement(exp, alternate){
     let ifStatement = { line: exp.loc.start.line, type: typeExpression, name: '', condition: parseSmallExpression(exp.test), value: ''};
     parsingResults.push(ifStatement);
     parseExp(exp.consequent);
-    if(exp.alternate != null){
+    if(exp.alternate != null && exp.alternate.type !== 'BlockStatement'){
         parseExp(exp.alternate, true);
+    }
+    else if(exp.alternate != null){
+        let elseStatement = { line: exp.loc.start.line, type: 'else statement', name: '', condition: '', value: ''};
+        parsingResults.push(elseStatement);
+        parseExp(exp.alternate);
     }
 }
 
@@ -125,9 +133,6 @@ function parseExpHelpFunc(exp, alternate){
 }
 
 function parseExp (exp, alternate) {
-    if(exp === undefined || exp === ''){
-        return;
-    }
     switch (exp.type) {
     case 'VariableDeclaration': handleVariableDeclaration(exp); break;
     case 'VariableDeclarator': handleVariableDeclarator(exp); break;
@@ -140,5 +145,4 @@ function parseBody(parsedCode){
         parseExp(bodyElement, false);
     }
 }
-
 export {parseBody};
