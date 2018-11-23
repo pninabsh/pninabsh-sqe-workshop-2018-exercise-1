@@ -93,7 +93,7 @@ function handleIfStatement(exp, alternate){
     let ifStatement = { line: exp.loc.start.line, type: typeExpression, name: '', condition: parseSmallExpression(exp.test), value: ''};
     parsingResults.push(ifStatement);
     parseExp(exp.consequent);
-    if(exp.alternate != null && exp.alternate.type !== 'BlockStatement'){
+    if(exp.alternate != null && exp.alternate.type === 'IfStatement'){
         parseExp(exp.alternate, true);
     }
     else if(exp.alternate != null){
